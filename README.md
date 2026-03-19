@@ -166,6 +166,121 @@ Before releasing compensation, GigGuard runs a **multi-layer verification**:
 
 Once verified, compensation is **automatically transferred** to the worker's registered UPI/bank account — typically within **2–4 hours** of the disruption event.
 
+
 ---
+
+# 🧠 Adversarial Defense & Anti-Spoofing Strategy
+
+Gig Guard's compensation model is location-dependent — a worker must be in a weather-affected zone to be eligible for a payout. This makes GPS spoofing (feeding false location coordinates to a device) a major attack vector that requires a strong multi-layered defense system.
+
+GPS spoofing works by broadcasting counterfeit GPS signals at higher power than legitimate satellite signals, forcing the receiver to lock onto fake coordinates.
+
+---
+
+# 📡 1. Signal Power Monitoring
+
+Real GPS signals come from satellites approximately 20,200 km above Earth, arriving at very low signal power (around **−130 dBm**). A nearby spoofing device must transmit stronger signals to override them.
+
+## Carrier-to-Noise Ratio (C/No) Monitoring
+- Measures signal quality in real time  
+- Normal values remain stable  
+- Sudden deviations beyond **±3 dB** indicate suspicious activity  
+
+## Absolute Received Power Thresholding
+- Legitimate GPS signals stay within a known power range  
+- Stronger-than-expected signals are flagged as spoofing attempts  
+
+## L1/L2 Frequency Cross-Validation
+- GPS uses:
+  - **L1: 1575.42 MHz**
+  - **L2: 1227.60 MHz**
+- Most spoofers only imitate **L1**
+- Weak or missing **L2** when **L1** is strong suggests spoofing  
+
+---
+
+# 📐 2. Spatial & Phase Consistency Analysis
+
+Authentic GPS signals arrive from multiple satellite directions. Spoofed signals usually come from one source.
+
+## Multi-Antenna Phase Difference Checking
+- Uses multiple GNSS antennas  
+- Compares carrier phase differences  
+- Same phase pattern across all satellites indicates spoofing  
+
+## Receiver Movement Pattern Analysis
+- Tracks worker movement while walking  
+- Checks Doppler and phase consistency  
+- Nearby spoofers create abnormal movement-related signal behavior  
+
+---
+
+# ⏱️ 3. Time-of-Arrival (TOA) Delay Detection
+
+Spoofers must receive, process, and retransmit GPS signals, creating measurable delay.
+
+## Detection Method
+- GPS bit transitions occur every **20 ms**
+- Microsecond-level delay is suspicious  
+- Simultaneous delay across multiple satellites indicates spoofing  
+
+## L1/L2 Delay Cross-Check
+- Real signals follow known propagation delay models  
+- Incorrect inter-frequency timing reveals fake signals  
+
+---
+
+# 🔬 4. Signal Quality Monitoring (SQM)
+
+GPS receivers detect signals using correlation peaks.
+
+## Spoofing Effects on Correlation Peak
+- Peak flattening  
+- Peak asymmetry  
+- Skewed signal shape  
+
+## Gig Guard SQM Monitoring
+- Checks Early-Minus-Late (EML) symmetry  
+- Measures peak width  
+- Abnormal shapes trigger integrity alerts  
+
+---
+
+# ✅ Suggested Additional Improvements
+
+## Add Device Integrity Checks
+- Detect rooted devices  
+- Block fake GPS apps  
+- Verify sensor authenticity  
+
+## Add Sensor Fusion
+Combine:
+- GPS  
+- Accelerometer  
+- Gyroscope  
+- Network location  
+
+## Add Server-Side Verification
+- Compare user location with weather APIs  
+- Cross-check multiple reports in same zone  
+
+## Add AI-Based Anomaly Detection
+- Learn normal worker movement patterns  
+- Detect impossible jumps or repeated suspicious behavior  
+
+## Add Geofencing Validation
+- Confirm worker remains inside eligible weather zone  
+
+---
+
+# 🚀 Future Enhancement
+
+A stronger system can combine:
+- GNSS anti-spoofing  
+- Device security  
+- Cloud validation  
+- Machine learning detection  
+
+This creates a highly reliable payout protection model.
 
 
