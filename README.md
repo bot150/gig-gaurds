@@ -289,12 +289,6 @@ Insurance systems are inherently vulnerable to fraud. Gig Guard employs a **mult
 - Flags suspicious location manipulation attempts
 - Compares claimed location with historical work patterns of the user
 
-### 👤 Fake Account Detection
-- Duplicate PAN/Aadhaar/mobile number detection at registration
-- Behavioral pattern analysis to detect bot-like registration patterns
-- Network graph analysis to identify coordinated fraud rings
-- Identity verification via DigiLocker integration (planned)
-
 ### 📊 Activity Verification Engine
 - Platform API cross-checks (Swiggy, Zomato, Ola, Uber, etc.) to verify actual inactivity
 - GPS movement history analysis during claimed disruption window
