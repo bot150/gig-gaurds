@@ -69,6 +69,8 @@ These are not rare events. In India, weather disruptions affect gig workers on a
 The result: gig workers bear 100% of the financial risk from environmental disruptions, with no institutional support.  
 
 ---
+### OUR SOLUTION
+---
 ## 💡 What is GigGuard?
 
 > **GigGuard** is a web-based micro-insurance platform that provides automated, weather-triggered income compensation to gig workers. Think of it as a **financial airbag** — invisible when not needed, but instantly protective when a crisis hits.
