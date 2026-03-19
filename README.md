@@ -23,7 +23,7 @@
 
 ### 📊 Scale of the Crisis
 
-The global gig economy employs over 1.5 billion people worldwide. In India alone, the gig workforce is projected to reach 23.5 million workers by 2030 (NITI Aayog). Yet this massive workforce operates in a financial vacuum — no paid leave, no employee benefits, and crucially, no income protection when they can't work.  
+- The global gig economy employs over 1.5 billion people worldwide. In India alone, the gig workforce is projected to reach 23.5 million workers by 2030 (NITI Aayog). Yet this massive workforce operates in a financial vacuum — no paid leave, no employee benefits, and crucially, no income protection when they can't work.  
 ---
 
 ### 🌦️ Weather: 
