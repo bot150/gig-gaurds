@@ -1,4 +1,4 @@
-# 🛡️ Gig guard: Income Protection for Gig Workers
+# 🛡️ Ergoshield: Income Protection for Gig Workers
 "Because no worker should have to choose between their safety and their livelihood."
 
 ---
@@ -52,11 +52,11 @@ The result: gig workers bear 100% of the financial risk from environmental disru
 ---
 ### 💡 What is GigGuard?
 
-> **GigGuard** is a web-based micro-insurance platform that provides automated, weather-triggered income compensation to gig workers. Think of it as a **financial airbag** — invisible when not needed, but instantly protective when a crisis hits.
+> **Ergoshield** is a web-based micro-insurance platform that provides automated, weather-triggered income compensation to gig workers. Think of it as a **financial airbag** — invisible when not needed, but instantly protective when a crisis hits.
 
 ---
 
-GigGuard sits at the intersection of three powerful technologies:
+Ergoshield sits at the intersection of three powerful technologies:
 ```
 Real-Time Weather Data  +  AI Risk Assessment  +  Automated Insurance Engine
                                     =
@@ -80,7 +80,7 @@ Real-Time Weather Data  +  AI Risk Assessment  +  Automated Insurance Engine
 
 ### Step 1: 📝 Worker Onboarding
 
-Workers register on the GigGuard web platform in under **5 minutes**:
+Workers register on the Ergoshield web platform in under **5 minutes**:
 
 - **Personal Details** — name, contact, location (city/district),aadhar card,bank account
 - **Work Profile** — type of gig work (delivery, ride-share, freelance, daily wage, etc.)
@@ -123,7 +123,7 @@ Premiums are dynamically adjusted based on:
 
 ### Step 4: 🌦️ Real-Time Weather Monitoring
 
-GigGuard runs a **continuous weather intelligence layer** across all registered worker locations, evaluated every **15 minutes**.
+Ergoshield runs a **continuous weather intelligence layer** across all registered worker locations, evaluated every **15 minutes**.
 
 **Monitored Parameters:**
 - Rainfall intensity (mm/hour)
@@ -145,7 +145,7 @@ GigGuard runs a **continuous weather intelligence layer** across all registered 
 
 When a weather threshold is breached in a worker's registered zone:
 
-1. GigGuard sends a **push notification / SMS alert** to the worker
+1. Ergoshield sends a **push notification / SMS alert** to the worker
 2. Worker receives **safety guidance** *(e.g., "Heavy rainfall detected in your area — avoid travel on 2-wheelers")*
 3. Worker is prompted to **confirm non-working status** via a simple app check-in or GPS inactivity detection
 4. **Compensation eligibility window opens**
@@ -171,7 +171,7 @@ Once verified, compensation is **automatically transferred** to the worker's reg
 
 ## 🧠 Adversarial Defense & Anti-Spoofing Strategy
 
-Gig Guard's compensation model is location-dependent — a worker must be in a weather-affected zone to be eligible for a payout. This makes GPS spoofing (feeding false location coordinates to a device) a major attack vector that requires a strong multi-layered defense system.
+Ergoshield's compensation model is location-dependent — a worker must be in a weather-affected zone to be eligible for a payout. This makes GPS spoofing (feeding false location coordinates to a device) a major attack vector that requires a strong multi-layered defense system.
 
 GPS spoofing works by broadcasting counterfeit GPS signals at higher power than legitimate satellite signals, forcing the receiver to lock onto fake coordinates.
 
@@ -239,7 +239,7 @@ GPS receivers detect signals using correlation peaks.
 - Peak asymmetry  
 - Skewed signal shape  
 
-### Gig Guard SQM Monitoring
+### Ergoshield SQM Monitoring
 - Checks Early-Minus-Late (EML) symmetry  
 - Measures peak width  
 - Abnormal shapes trigger integrity alerts  
@@ -265,7 +265,7 @@ GPS receivers detect signals using correlation peaks.
 ---
 ## 🔴 Risk Classification System
 
-Gig Guard uses a **3-tier risk classification model** to determine compensation amounts:
+Ergoshield uses a **3-tier risk classification model** to determine compensation amounts:
 
 | Risk Level | Trigger Conditions | Compensation Rate | Example Scenario |
 |-----------|------------------|-------------------|------------------|
