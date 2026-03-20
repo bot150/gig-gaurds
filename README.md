@@ -50,7 +50,7 @@ The result: gig workers bear 100% of the financial risk from environmental disru
 ---
 ## Our Solution
 ---
-### 💡 What is GigGuard?
+### 💡 What is Ergoshield?
 
 > **Ergoshield** is a web-based micro-insurance platform that provides automated, weather-triggered income compensation to gig workers. Think of it as a **financial airbag** — invisible when not needed, but instantly protective when a crisis hits.
 
@@ -93,7 +93,7 @@ This data forms the foundation of their **personal risk profile**.
 
 ### Step 2: 🤖 Smart Plan Recommendation
 
-GigGuard's recommendation engine analyzes multiple data points to suggest the most suitable insurance plan:
+Ergoshield's recommendation engine analyzes multiple data points to suggest the most suitable insurance plan:
 
 - Historical weather data for the worker's location *(past 5 years of disruption frequency)*
 - Declared income level to calculate appropriate coverage amounts
@@ -154,7 +154,7 @@ When a weather threshold is breached in a worker's registered zone:
 
 ### Step 6: ✅ Verification & Automated Payout
 
-Before releasing compensation, GigGuard runs a **multi-layer verification**:
+Before releasing compensation, Ergoshield runs a **multi-layer verification**:
 
 | Verification Layer | Description |
 |---|---|
@@ -280,7 +280,7 @@ Ergoshield uses a **3-tier risk classification model** to determine compensation
 - Platform suspension status (if gig apps suspend operations in the area)
 ## 🛡️ Fraud Detection & Security
 
-Insurance systems are inherently vulnerable to fraud. Gig Guard employs a **multi-layer fraud prevention architecture** to protect the integrity of the platform and ensure legitimate workers receive fair compensation.
+Insurance systems are inherently vulnerable to fraud. Ergoshield employs a **multi-layer fraud prevention architecture** to protect the integrity of the platform and ensure legitimate workers receive fair compensation.
 
 ### 🔍 GPS Spoofing Detection
 - Detects impossible location jumps (teleportation patterns)
@@ -362,12 +362,6 @@ Early warnings sent before severe weather events
 | Freelance Outdoor Workers | Electricians, plumbers, painters | Unable to work on-site |
 | Auto / E-Rickshaw Drivers | Local transport workers | Exposure to extreme weather |
 
-
-## 💡 Opportunity Insight:
-
-With just 5% market penetration and ₹75/week premium (~₹3,900/year), Gig Guard can generate ₹600+ crore annually in India.
-
----
 
 ## 🚀 Benefits
 
