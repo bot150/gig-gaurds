@@ -23,7 +23,7 @@ import {
   Shield,
   ArrowRight
 } from 'lucide-react';
-import Weather from "../weather"; // adjust path
+
 
 export const Dashboard: React.FC = () => {
   const { profile } = useAuth();
