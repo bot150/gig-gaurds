@@ -354,10 +354,6 @@ Early warnings sent before severe weather events
 |----------|------------|----------------|
 | Delivery Partners | Swiggy, Zomato, Blinkit, Amazon riders | Income drops to zero during rain |
 | Ride-Share Drivers | Ola, Uber, Rapido drivers | Reduced demand & safety risks |
-| Daily Wage Workers | Construction workers, vendors | No income during disruptions |
-| Freelance Outdoor Workers | Electricians, plumbers, painters | Unable to work on-site |
-| Auto / E-Rickshaw Drivers | Local transport workers | Exposure to extreme weather |
-
 
 ## 🚀 Benefits
 
