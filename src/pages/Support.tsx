@@ -11,7 +11,7 @@ export const SupportPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700">
       <div className="text-center">
-        <h2 className="text-4xl font-black text-neutral-900 tracking-tighter mb-4">How can we help?</h2>
+        <h2 className="text-5xl md:text-6xl font-display uppercase tracking-tighter text-neutral-900 mb-4">How can we help?</h2>
         <p className="text-neutral-500 text-lg font-medium">Our AI assistant and support team are here for you 24/7.</p>
       </div>
 
@@ -20,7 +20,7 @@ export const SupportPage: React.FC = () => {
           <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <MessageSquare size={28} />
           </div>
-          <h3 className="font-bold text-neutral-900 mb-2">Live Chat</h3>
+          <h3 className="text-xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Live Chat</h3>
           <p className="text-sm text-neutral-500 mb-6">Talk to our AI assistant for instant answers.</p>
           <button className="w-full py-3 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors">Start Chat</button>
         </div>
@@ -29,7 +29,7 @@ export const SupportPage: React.FC = () => {
           <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Phone size={28} />
           </div>
-          <h3 className="font-bold text-neutral-900 mb-2">Call Support</h3>
+          <h3 className="text-xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Call Support</h3>
           <p className="text-sm text-neutral-500 mb-6">Available for emergency assistance.</p>
           <button className="w-full py-3 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors">Call Now</button>
         </div>
@@ -38,15 +38,15 @@ export const SupportPage: React.FC = () => {
           <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Mail size={28} />
           </div>
-          <h3 className="font-bold text-neutral-900 mb-2">Email Us</h3>
+          <h3 className="text-xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Email Us</h3>
           <p className="text-sm text-neutral-500 mb-6">Send us your detailed queries.</p>
           <button className="w-full py-3 bg-neutral-900 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors">Send Email</button>
         </div>
       </div>
 
       <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
-        <div className="p-8 border-b border-neutral-100">
-          <h3 className="text-xl font-bold text-neutral-900">Frequently Asked Questions</h3>
+        <div className="p-8 border-b border-neutral-100 bg-neutral-50/50">
+          <h3 className="text-2xl font-display uppercase tracking-tighter text-neutral-900">Frequently Asked Questions</h3>
         </div>
         <div className="divide-y divide-neutral-100">
           {faqs.map((faq, i) => (

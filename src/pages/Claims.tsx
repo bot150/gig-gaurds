@@ -28,8 +28,8 @@ export const ClaimsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-neutral-900">Your Claims</h2>
-        <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl font-bold text-sm border border-emerald-100">
+        <h2 className="text-4xl md:text-5xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Claim History</h2>
+        <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] border border-emerald-100">
           Total Payouts: ₹{claims.filter(c => c.status === 'processed').reduce((acc, c) => acc + c.amount, 0)}
         </div>
       </div>
@@ -55,7 +55,7 @@ export const ClaimsPage: React.FC = () => {
                   <AlertCircle size={28} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-neutral-900 text-lg">{claim.triggerEvent}</h3>
+                  <h3 className="font-display text-xl md:text-2xl uppercase tracking-tighter text-neutral-900">{claim.triggerEvent}</h3>
                   <div className="flex items-center gap-4 mt-1">
                     <span className="text-sm text-neutral-500 flex items-center gap-1">
                       <Clock size={14} /> {new Date(claim.timestamp).toLocaleString()}
@@ -69,12 +69,12 @@ export const ClaimsPage: React.FC = () => {
 
               <div className="flex items-center justify-between md:justify-end gap-8 border-t md:border-t-0 pt-4 md:pt-0">
                 <div className="text-right">
-                  <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">Compensation</p>
-                  <p className="text-2xl font-black text-neutral-900">₹{claim.amount}</p>
+                  <p className="text-[10px] text-neutral-400 font-black uppercase tracking-[0.2em] mb-1">Compensation</p>
+                  <p className="text-3xl font-display tracking-tighter text-emerald-600">₹{claim.amount}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">Status</p>
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase ${
+                  <p className="text-[10px] text-neutral-400 font-black uppercase tracking-[0.2em] mb-2">Status</p>
+                  <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] ${
                     claim.status === 'processed' ? 'bg-emerald-100 text-emerald-700' :
                     claim.status === 'pending' ? 'bg-orange-100 text-orange-700' :
                     'bg-red-100 text-red-700'
@@ -93,7 +93,7 @@ export const ClaimsPage: React.FC = () => {
           <CheckCircle2 size={20} />
         </div>
         <div>
-          <h4 className="font-bold text-blue-900">How payouts work?</h4>
+          <h4 className="font-black uppercase tracking-widest text-[10px] text-blue-900 mb-2">How payouts work?</h4>
           <p className="text-sm text-blue-700 mt-1">
             ErgoShield uses parametric triggers. When weather or platform data confirms a disruption in your area, 
             we automatically process your claim. No manual filing required! Payouts are sent directly to your linked bank account.

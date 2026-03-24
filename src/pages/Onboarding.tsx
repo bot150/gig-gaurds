@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc, updateDoc, getDoc, setDoc, addDoc, collection } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useAuth } from '../AuthContext';
-import { ShoppingBag, Utensils, Zap, ChevronRight, CheckCircle2, CreditCard, UserCheck, AlertCircle, MapPin, Loader2, RefreshCw, CloudRain, Sun, Cloud, Wind, Droplets } from 'lucide-react';
+import { ShoppingBag, Utensils, Zap, ChevronRight, CheckCircle2, CreditCard, UserCheck, AlertCircle, MapPin, Loader2, RefreshCw, CloudRain, Sun, Cloud, Wind, Droplets, Shield } from 'lucide-react';
 import { calculateRiskScore } from '../services/gemini';
 import { useRef, useEffect } from 'react';
 import { fetchWeatherByCoords, fetchWeatherByCity } from '../services/weatherService';
@@ -97,6 +97,8 @@ export const Onboarding: React.FC = () => {
     age: '',
     location: 'New Delhi',
   });
+  const [aadharFile, setAadharFile] = useState<File | null>(null);
+  const [bankFile, setBankFile] = useState<File | null>(null);
   const [accountData, setAccountData] = useState({
     emailOrPhone: profile?.email || user?.email || '',
   });
@@ -174,7 +176,7 @@ export const Onboarding: React.FC = () => {
         currentWeather || { temp: 32, humidity: 80, forecast: "Clear" }
       );
       setRiskResult(result);
-      setStep(5);
+      await finalizeOnboarding(result);
     } catch (err) {
       console.error(err);
       setError('Failed to calculate risk profile. Please try again.');
@@ -333,7 +335,7 @@ export const Onboarding: React.FC = () => {
         handleFirestoreError(err, OperationType.WRITE, 'indices');
       }
 
-      setStep(6);
+      setStep(5);
     } catch (err) {
       console.error(err);
       setError('An error occurred during verification. Please try again.');
@@ -447,12 +449,13 @@ export const Onboarding: React.FC = () => {
                       className="hidden"
                       id="aadhar-upload"
                       accept="image/*,.pdf"
+                      onChange={(e) => setAadharFile(e.target.files?.[0] || null)}
                     />
                     <label 
                       htmlFor="aadhar-upload"
-                      className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-neutral-200 rounded-xl text-xs font-bold text-neutral-500 hover:border-emerald-500 hover:text-emerald-600 cursor-pointer transition-all"
+                      className={`flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed rounded-xl text-xs font-bold cursor-pointer transition-all ${aadharFile ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-neutral-200 text-neutral-500 hover:border-emerald-500 hover:text-emerald-600'}`}
                     >
-                      <Zap size={14} /> Upload Aadhar Card
+                      {aadharFile ? <><CheckCircle2 size={16} /> {aadharFile.name}</> : <><Zap size={14} /> Upload Aadhar Card</>}
                     </label>
                   </div>
                 </div>
@@ -538,12 +541,13 @@ export const Onboarding: React.FC = () => {
                       className="hidden"
                       id="bank-upload"
                       accept="image/*,.pdf"
+                      onChange={(e) => setBankFile(e.target.files?.[0] || null)}
                     />
                     <label 
                       htmlFor="bank-upload"
-                      className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-neutral-200 rounded-xl text-xs font-bold text-neutral-500 hover:border-emerald-500 hover:text-emerald-600 cursor-pointer transition-all"
+                      className={`flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed rounded-xl text-xs font-bold cursor-pointer transition-all ${bankFile ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-neutral-200 text-neutral-500 hover:border-emerald-500 hover:text-emerald-600'}`}
                     >
-                      <Zap size={14} /> Upload Bank Passbook
+                      {bankFile ? <><CheckCircle2 size={16} /> {bankFile.name}</> : <><Zap size={14} /> Upload Bank Passbook</>}
                     </label>
                   </div>
                 </div>
@@ -631,42 +635,83 @@ export const Onboarding: React.FC = () => {
           </div>
         )}
 
-        {step === 5 && riskResult && (
+        {step === 5 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-            <h2 className="text-3xl font-bold text-neutral-900 mb-2">Activate Protection</h2>
-            <p className="text-neutral-500 mb-8">Pay your first weekly premium to activate your insurance</p>
-            
-            <div className="bg-emerald-50 rounded-2xl p-8 border border-emerald-100 mb-8">
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-emerald-800 font-medium">Weekly Premium</span>
-                <span className="text-emerald-900 font-bold text-3xl">₹{riskResult.premium}</span>
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 size={48} />
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-emerald-700 text-sm">
-                  <CheckCircle2 size={18} />
-                  <span>Instant coverage activation</span>
+              <h2 className="text-3xl font-bold text-neutral-900 mb-2">Welcome to ErgoShield!</h2>
+              <p className="text-neutral-500">Your profile is ready. Choose a protection plan or explore the dashboard first.</p>
+            </div>
+
+            {riskResult && (
+              <div className="bg-neutral-50 rounded-2xl p-4 mb-6 border border-neutral-200 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-1">Your AI Risk Score</p>
+                  <p className="text-2xl font-bold text-neutral-900">{riskResult.score}/100</p>
                 </div>
-                <div className="flex items-center gap-3 text-emerald-700 text-sm">
-                  <CheckCircle2 size={18} />
-                  <span>Risk Score: {riskResult.score}/100</span>
-                </div>
-                <div className="flex items-center gap-3 text-emerald-700 text-sm">
-                  <CheckCircle2 size={18} />
-                  <span>Secure payment via Razorpay</span>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-1">Recommended</p>
+                  <p className="text-2xl font-bold text-emerald-600">₹{riskResult.premium}/week</p>
                 </div>
               </div>
+            )}
+
+            <div className="grid grid-cols-1 gap-4 mb-6">
+              {[
+                { id: 'basic', name: 'Basic Shield', premium: 30, payout: '₹2,000', color: 'emerald', tagline: 'Essential coverage for low-risk zones' },
+                { id: 'standard', name: 'Standard Shield', premium: 50, payout: '₹5,000', color: 'blue', tagline: 'AI-recommended balanced protection' },
+                { id: 'premium', name: 'Premium Shield', premium: 70, payout: '₹10,000', color: 'purple', tagline: 'Maximum coverage for high-risk conditions' },
+              ].map((plan) => {
+                const isRecommended = riskResult && riskResult.premium === plan.premium;
+                return (
+                  <button
+                    key={plan.id}
+                    onClick={() => {
+                      // Just navigate to dashboard; actual subscription handled in Insurance page
+                      navigate('/dashboard');
+                    }}
+                    className={`relative flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all hover:shadow-lg ${
+                      isRecommended
+                        ? 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-100'
+                        : 'border-neutral-100 bg-white hover:border-neutral-200'
+                    }`}
+                  >
+                    {isRecommended && (
+                      <div className="absolute -top-2.5 right-4 bg-emerald-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                        AI Recommended
+                      </div>
+                    )}
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                      plan.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' :
+                      plan.color === 'blue' ? 'bg-blue-100 text-blue-600' :
+                      'bg-purple-100 text-purple-600'
+                    }`}>
+                      <Shield size={24} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-neutral-900">{plan.name}</h4>
+                      <p className="text-xs text-neutral-500 truncate">{plan.tagline}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-2xl font-bold text-neutral-900">₹{plan.premium}</p>
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase">/week</p>
+                    </div>
+                    <ChevronRight size={18} className="text-neutral-300 shrink-0" />
+                  </button>
+                );
+              })}
             </div>
 
             <button
-              onClick={handlePayment}
-              disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-200 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              onClick={() => navigate('/dashboard')}
+              className="w-full py-4 rounded-xl border-2 border-neutral-200 text-neutral-500 font-bold hover:bg-neutral-50 hover:text-neutral-700 transition-all"
             >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : <CreditCard size={20} />}
-              Pay ₹{riskResult.premium} & Activate Now
+              Skip for now → Go to Dashboard
             </button>
-            <p className="text-center text-xs text-neutral-400 mt-4">
-              By paying, you agree to the auto-renewal of your weekly premium.
+            <p className="text-center text-xs text-neutral-400 mt-3">
+              You can always choose a plan later from the Insurance page.
             </p>
           </div>
         )}

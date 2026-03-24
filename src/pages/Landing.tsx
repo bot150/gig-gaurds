@@ -97,7 +97,7 @@ export const Landing: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
+
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,7 +111,7 @@ export const Landing: React.FC = () => {
     try {
       const provider = new GoogleAuthProvider();
       const { user: firebaseUser } = await signInWithPopup(auth, provider);
-      
+
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       let userDoc;
       try {
@@ -119,7 +119,7 @@ export const Landing: React.FC = () => {
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `users/${firebaseUser.uid}`);
       }
-      
+
       if (!userDoc?.exists()) {
         try {
           await setDoc(userDocRef, {
@@ -183,7 +183,7 @@ export const Landing: React.FC = () => {
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `indices/phone_${phoneNumber}`);
       }
-      
+
       if (phoneSnap?.exists()) {
         setError('This phone number is already registered.');
         setLoading(false);
@@ -249,7 +249,7 @@ export const Landing: React.FC = () => {
             </div>
             <span className="text-xl md:text-3xl font-display uppercase tracking-tighter">ErgoShield</span>
           </div>
-          
+
           <div className="hidden md:flex items-center gap-10 text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em]">
             <a href="#features" className="hover:text-emerald-600 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-emerald-600 transition-colors">How it Works</a>
@@ -259,13 +259,13 @@ export const Landing: React.FC = () => {
           <div className="flex items-center gap-3 md:gap-6">
             {user ? (
               <div className="flex items-center gap-3 md:gap-6">
-                <button 
+                <button
                   onClick={() => navigate('/dashboard')}
                   className="bg-neutral-900 text-white px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm hover:bg-emerald-600 transition-all shadow-xl shadow-neutral-200 cursor-pointer"
                 >
                   Dashboard
                 </button>
-                <button 
+                <button
                   onClick={handleSignOut}
                   className="text-[10px] font-black text-neutral-400 uppercase tracking-widest hover:text-red-600 transition-colors cursor-pointer"
                 >
@@ -274,13 +274,13 @@ export const Landing: React.FC = () => {
               </div>
             ) : (
               <>
-                <button 
+                <button
                   onClick={() => setView('login_methods')}
                   className="hidden sm:block text-[10px] font-black text-neutral-400 uppercase tracking-widest hover:text-emerald-600 transition-colors cursor-pointer"
                 >
                   Sign In
                 </button>
-                <button 
+                <button
                   onClick={() => setView('register_platform')}
                   className="bg-emerald-600 text-white px-4 md:px-8 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm hover:bg-neutral-900 shadow-xl shadow-emerald-200 transition-all cursor-pointer"
                 >
@@ -296,15 +296,15 @@ export const Landing: React.FC = () => {
       <section className="relative pt-32 pb-32 px-6 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.12),transparent_50%)] pointer-events-none" />
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-left relative z-10"
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
@@ -313,16 +313,16 @@ export const Landing: React.FC = () => {
               <Zap size={14} className="fill-emerald-600" />
               The Future of Gig Work Security
             </motion.div>
-            
+
             <h1 className="text-6xl sm:text-7xl md:text-[12rem] font-display uppercase leading-[0.85] text-neutral-900 mb-6 md:mb-10 tracking-tighter">
               Your Hustle <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-400">Our Shield.</span>
             </h1>
-            
+
             <p className="max-w-xl text-lg md:text-2xl text-neutral-500 mb-8 md:mb-12 font-medium leading-relaxed">
               You brave the roads, the heat, and the rain. We ensure your earnings never stop. <span className="text-neutral-900 font-bold italic font-serif">ErgoShield</span> is the first AI-powered safety net built exclusively for India's delivery heroes.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-6 md:gap-10 mb-8 md:mb-12">
               <div className="flex items-center gap-3 group">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
@@ -339,7 +339,7 @@ export const Landing: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <button 
+              <button
                 onClick={() => setView('register_platform')}
                 className="w-full sm:w-auto group bg-neutral-900 text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl font-bold text-lg md:text-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-emerald-200"
               >
@@ -348,14 +348,14 @@ export const Landing: React.FC = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
             className="relative"
           >
             <div className="absolute -inset-4 bg-emerald-500/10 blur-3xl rounded-full" />
-            
+
             {user ? (
               <div className="bg-white p-10 rounded-[40px] border border-neutral-100 shadow-2xl text-center">
                 <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -364,13 +364,13 @@ export const Landing: React.FC = () => {
                 <h2 className="text-3xl font-black text-neutral-900 mb-4">Welcome Back!</h2>
                 <p className="text-neutral-500 mb-8 font-medium">You're already protected. Head over to your dashboard to manage your shield.</p>
                 <div className="flex flex-col gap-3 relative z-20">
-                  <button 
+                  <button
                     onClick={() => navigate('/dashboard')}
                     className="w-full bg-emerald-600 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     Go to Dashboard <ChevronRight size={20} />
                   </button>
-                  <button 
+                  <button
                     onClick={handleSignOut}
                     className="w-full bg-white border-2 border-neutral-100 text-neutral-600 px-10 py-4 rounded-2xl font-bold text-sm hover:border-red-200 hover:text-red-600 transition-all cursor-pointer"
                   >
@@ -380,9 +380,9 @@ export const Landing: React.FC = () => {
               </div>
             ) : (
               <div className="bg-white p-6 md:p-10 rounded-[32px] md:rounded-[40px] border border-neutral-100 border-t-4 border-t-white shadow-2xl relative overflow-hidden min-h-[450px] md:min-h-[500px] flex flex-col">
-                
+
                 {view !== 'initial' && (
-                  <button 
+                  <button
                     onClick={() => {
                       if (view === 'email_login' || view === 'phone_login') setView('login_methods');
                       else if (view === 'login_methods') setView('initial');
@@ -409,13 +409,13 @@ export const Landing: React.FC = () => {
                         </p>
                       </div>
                       <div className="space-y-4">
-                        <button 
+                        <button
                           onClick={() => setView('register_platform')}
                           className="w-full bg-neutral-900 text-white font-black text-xl py-6 rounded-2xl shadow-2xl shadow-neutral-200 hover:bg-emerald-600 transition-all flex items-center justify-center gap-3"
                         >
                           Register Now <ChevronRight size={24} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => setView('login_methods')}
                           className="w-full bg-white border-2 border-neutral-100 text-neutral-900 font-black text-xl py-6 rounded-2xl hover:border-emerald-600 transition-all"
                         >
@@ -579,7 +579,7 @@ export const Landing: React.FC = () => {
                         <h2 className="text-3xl md:text-4xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Create Account</h2>
                         <p className="text-neutral-500 font-medium text-sm md:text-base">Registering for <span className="text-emerald-600 font-black">{selectedPlatform}</span></p>
                       </div>
-                      
+
                       <button
                         onClick={handleGoogleSignIn}
                         disabled={loading}
@@ -660,7 +660,7 @@ export const Landing: React.FC = () => {
                     {error}
                   </div>
                 )}
-                
+
                 <p className="text-center mt-6 text-[10px] text-neutral-400 font-medium">
                   {view === 'initial' ? 'By continuing, you agree to our Terms.' : ''}
                 </p>
@@ -692,7 +692,7 @@ export const Landing: React.FC = () => {
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(16,185,129,0.15),transparent_60%)]" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.1),transparent_60%)]" />
         </div>
-        
+
         <div className="max-w-7xl mx-auto relative z-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -708,7 +708,7 @@ export const Landing: React.FC = () => {
               Stop worrying about rain, accidents, or platform bans. ErgoShield automatically triggers payments when your income is at risk.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 md:gap-8">
-              <button 
+              <button
                 onClick={() => navigate('/signup')}
                 className="w-full sm:w-auto bg-emerald-600 text-white px-10 md:px-16 py-5 md:py-8 rounded-2xl md:rounded-[32px] font-black text-lg md:text-xl hover:bg-white hover:text-black transition-all shadow-2xl shadow-emerald-900/40 uppercase tracking-widest"
               >
@@ -739,7 +739,7 @@ export const Landing: React.FC = () => {
               { label: 'Auto-Triggered', value: '100%' },
               { label: 'Avg. Weekly Cost', value: '₹50' }
             ].map((stat, idx) => (
-              <motion.div 
+              <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -760,7 +760,7 @@ export const Landing: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-24">
             <div className="max-w-3xl">
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -781,50 +781,47 @@ export const Landing: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
-              { 
-                title: 'Instant Payouts', 
+              {
+                title: 'Instant Payouts',
                 desc: 'When rain hits or the app crashes, we know. Payouts land in your account before the storm clears.',
                 icon: Zap,
                 theme: 'light'
               },
-              { 
-                title: 'AI Risk Profiling', 
+              {
+                title: 'AI Risk Profiling',
                 desc: 'Our Gemini AI analyzes weather and traffic patterns to give you the fairest, lowest premiums in India.',
                 icon: BarChart3,
                 theme: 'dark'
               },
-              { 
-                title: 'Income Security', 
+              {
+                title: 'Income Security',
                 desc: "Never lose a day's earnings to things you can't control. We're the safety net that's always there.",
                 icon: Heart,
                 theme: 'emerald'
               }
             ].map((feature, idx) => (
-              <motion.div 
+              <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
                 whileHover={{ y: -15 }}
-                className={`rounded-[32px] md:rounded-[50px] p-8 md:p-14 flex flex-col justify-between shadow-2xl transition-all duration-500 min-h-[350px] md:aspect-square ${
-                  feature.theme === 'dark' ? 'bg-neutral-900 text-white shadow-neutral-200/50' : 
-                  feature.theme === 'emerald' ? 'bg-emerald-600 text-white shadow-emerald-200/50' : 
-                  'bg-white text-neutral-900 shadow-neutral-100'
-                }`}
+                className={`rounded-[32px] md:rounded-[50px] p-8 md:p-14 flex flex-col justify-between shadow-2xl transition-all duration-500 min-h-[350px] md:aspect-square ${feature.theme === 'dark' ? 'bg-neutral-900 text-white shadow-neutral-200/50' :
+                    feature.theme === 'emerald' ? 'bg-emerald-600 text-white shadow-emerald-200/50' :
+                      'bg-white text-neutral-900 shadow-neutral-100'
+                  }`}
               >
-                <div className={`w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg ${
-                  feature.theme === 'dark' ? 'bg-white text-neutral-900' : 
-                  feature.theme === 'emerald' ? 'bg-white text-emerald-600' : 
-                  'bg-emerald-600 text-white'
-                }`}>
+                <div className={`w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg ${feature.theme === 'dark' ? 'bg-white text-neutral-900' :
+                    feature.theme === 'emerald' ? 'bg-white text-emerald-600' :
+                      'bg-emerald-600 text-white'
+                  }`}>
                   <feature.icon size={28} className="md:w-10 md:h-10" />
                 </div>
                 <div>
                   <h3 className="text-2xl md:text-4xl font-black mb-4 md:mb-6 leading-tight">{feature.title.split(' ').map((word, i) => <React.Fragment key={i}>{word}<br className="hidden md:block" /> </React.Fragment>)}</h3>
-                  <p className={`text-base md:text-lg font-medium leading-relaxed ${
-                    feature.theme === 'light' ? 'text-neutral-500' : 'text-white/70'
-                  }`}>
+                  <p className={`text-base md:text-lg font-medium leading-relaxed ${feature.theme === 'light' ? 'text-neutral-500' : 'text-white/70'
+                    }`}>
                     {feature.desc}
                   </p>
                 </div>
@@ -853,8 +850,8 @@ export const Landing: React.FC = () => {
               Join 50,000+ delivery partners who have already protected their hustle.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 md:gap-8">
-              <Link 
-                to="/signup" 
+              <Link
+                to="/signup"
                 className="w-full sm:w-auto bg-emerald-600 text-white px-10 md:px-14 py-4 md:py-6 rounded-2xl md:rounded-3xl font-bold text-xl md:text-2xl hover:bg-emerald-500 transition-all shadow-2xl shadow-emerald-900/40 hover:-translate-y-1"
               >
                 Join ErgoShield Today

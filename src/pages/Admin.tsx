@@ -97,7 +97,7 @@ export const AdminPanel: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-neutral-900">Admin Analytics</h2>
+        <h2 className="text-4xl font-display uppercase tracking-tighter text-neutral-900">Admin Analytics</h2>
         <div className="flex gap-3">
           <button 
             onClick={() => triggerDisruption('Heavy Rain', 'high')}
@@ -114,15 +114,15 @@ export const AdminPanel: React.FC = () => {
             <div className={`w-12 h-12 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center mb-4`}>
               <stat.icon size={24} />
             </div>
-            <p className="text-neutral-500 text-sm font-medium">{stat.label}</p>
-            <p className="text-2xl font-bold text-neutral-900 mt-1">{stat.value}</p>
+            <p className="text-[10px] text-neutral-400 font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+            <p className="text-3xl font-display tracking-tighter text-neutral-900 mt-1">{stat.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm">
-          <h3 className="text-xl font-bold text-neutral-900 mb-8">Worker Distribution</h3>
+          <h3 className="text-2xl font-display uppercase tracking-tighter text-neutral-900 mb-8">Worker Distribution</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -154,7 +154,7 @@ export const AdminPanel: React.FC = () => {
         </div>
 
         <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm">
-          <h3 className="text-xl font-bold text-neutral-900 mb-8">Disruption Analytics</h3>
+          <h3 className="text-2xl font-display uppercase tracking-tighter text-neutral-900 mb-8">Disruption Analytics</h3>
           <div className="space-y-4">
             {disruptions.slice(0, 5).map((d) => (
               <div key={d.id} className="flex items-center justify-between p-4 bg-neutral-50 rounded-2xl border border-neutral-100">

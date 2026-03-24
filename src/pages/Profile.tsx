@@ -284,7 +284,7 @@ export const ProfilePage: React.FC = () => {
               </div>
             ) : (
               <>
-                <h2 className="text-3xl font-bold text-neutral-900">{profile.fullName}</h2>
+                <h2 className="text-4xl font-display uppercase tracking-tighter text-neutral-900">{profile.fullName}</h2>
                 <p className="text-neutral-500 flex items-center gap-2 mt-1">
                   <Shield size={16} className="text-emerald-600" />
                   Verified Delivery Partner
@@ -300,7 +300,7 @@ export const ProfilePage: React.FC = () => {
                   <item.icon size={20} />
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">{item.label}</p>
+                  <p className="text-[10px] text-neutral-400 font-black uppercase tracking-[0.2em] mb-1">{item.label}</p>
                   <p className="text-neutral-900 font-medium">{item.value}</p>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export const ProfilePage: React.FC = () => {
             <AlertCircle size={20} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-neutral-900">Document Verification</h3>
+            <h3 className="text-2xl font-display uppercase tracking-tighter text-neutral-900">Document Verification</h3>
             <p className="text-sm text-neutral-500">Ensure your documents are up to date for instant payouts.</p>
           </div>
         </div>
@@ -389,8 +389,8 @@ export const ProfilePage: React.FC = () => {
 
       <div className="mt-8 bg-emerald-50 rounded-3xl p-8 border border-emerald-100 flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h3 className="text-xl font-bold text-emerald-900">Weekly Protection Active</h3>
-          <p className="text-emerald-700 mt-1">Your next premium of ₹{profile.weeklyPremium} will be deducted on Monday.</p>
+          <h3 className="text-2xl font-display uppercase tracking-tighter text-emerald-900">Weekly Shield Active</h3>
+          <p className="text-emerald-700 mt-1 font-medium">Your premium of <span className="font-bold">₹{profile.weeklyPremium}</span> will automatically renew next week.</p>
         </div>
         <button className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all">
           Manage Subscription

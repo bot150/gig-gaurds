@@ -101,11 +101,11 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ onWeatherUpdate })
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <div className="flex items-center gap-2 text-white/60 text-xs font-medium uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-2 text-white/60 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
               <MapPin className="w-3 h-3" />
               <span>Current Weather</span>
             </div>
-            <h3 className="text-4xl font-black text-white flex items-center gap-3">
+            <h3 className="text-5xl font-display uppercase tracking-tighter text-white flex items-center gap-3">
               {weather?.city || 'Detecting...'}
               <button 
                 onClick={() => setShowInput(!showInput)}
@@ -117,10 +117,10 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ onWeatherUpdate })
           </div>
           {weather && (
             <div className="text-right">
-              <div className="text-6xl font-black text-white leading-none tracking-tighter">
+              <div className="text-7xl font-display tracking-tighter text-white leading-none">
                 {weather.temp}°
               </div>
-              <div className="text-sm text-emerald-100 font-bold mt-2 uppercase tracking-widest">
+              <div className="text-[10px] text-emerald-100 font-black mt-3 uppercase tracking-[0.2em]">
                 {weather.condition}
               </div>
             </div>
@@ -157,22 +157,22 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({ onWeatherUpdate })
 
         {weather && (
           <div className="grid grid-cols-2 gap-6 mt-4">
-            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Droplets className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition-all hover:bg-white/20">
+              <div className="p-4 bg-white/20 rounded-xl shadow-inner">
+                <Droplets className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-[10px] text-emerald-100 uppercase font-black tracking-widest">Humidity</div>
-                <div className="text-xl font-black text-white">{weather.humidity}%</div>
+                <div className="text-[10px] text-emerald-100 uppercase font-black tracking-[0.2em] mb-1">Humidity</div>
+                <div className="text-2xl font-display tracking-tighter text-white">{weather.humidity}%</div>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-              <div className="p-3 bg-white/20 rounded-xl">
-                <Wind className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 transition-all hover:bg-white/20">
+              <div className="p-4 bg-white/20 rounded-xl shadow-inner">
+                <Wind className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="text-[10px] text-emerald-100 uppercase font-black tracking-widest">Wind Speed</div>
-                <div className="text-xl font-black text-white">{weather.windSpeed} m/s</div>
+                <div className="text-[10px] text-emerald-100 uppercase font-black tracking-[0.2em] mb-1">Wind Speed</div>
+                <div className="text-2xl font-display tracking-tighter text-white">{weather.windSpeed} m/s</div>
               </div>
             </div>
           </div>

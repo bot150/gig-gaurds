@@ -14,37 +14,37 @@ import { motion, AnimatePresence } from 'motion/react';
 const plans = [
   {
     id: 'basic',
-    name: 'Basic Plan',
-    premium: 150,
-    payout: 5000,
-    duration: '3 days',
-    tagline: 'Affordable insurance for low-risk zones',
-    target: 'Low-risk zones, low income users',
-    savings: 1200,
+    name: 'Basic Shield',
+    premium: 30,
+    payout: 2000,
+    duration: '7 days',
+    tagline: 'Essential coverage for low-risk zones',
+    target: 'Low-risk zones, part-time workers',
+    savings: 600,
     recommended: false,
     color: 'emerald',
     icon: Shield
   },
   {
     id: 'standard',
-    name: 'Standard Plan',
-    premium: 200,
-    payout: 7000,
+    name: 'Standard Shield',
+    premium: 50,
+    payout: 5000,
     duration: '7 days',
-    tagline: 'Balanced coverage for daily workers',
-    target: 'Medium-risk, regular workers',
-    savings: 1800,
+    tagline: 'AI-recommended balanced protection',
+    target: 'Medium-risk, regular delivery workers',
+    savings: 1200,
     recommended: true,
     color: 'blue',
     icon: ShieldCheck
   },
   {
     id: 'premium',
-    name: 'Premium Plan',
-    premium: 230,
+    name: 'Premium Shield',
+    premium: 70,
     payout: 10000,
-    duration: '14 days',
-    tagline: 'Maximum insurance for extreme conditions',
+    duration: '7 days',
+    tagline: 'Maximum coverage for high-risk conditions',
     target: 'High-risk zones, full-time workers',
     savings: 2500,
     recommended: false,
@@ -98,7 +98,7 @@ export const InsurancePage: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col gap-2">
-        <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Insurance Plans</h2>
+        <h2 className="text-4xl md:text-5xl font-display uppercase tracking-tighter text-neutral-900 mb-2">Insurance Plans</h2>
         <p className="text-neutral-500 font-medium">Choose the best protection plan for your gig work.</p>
       </div>
 
@@ -123,18 +123,18 @@ export const InsurancePage: React.FC = () => {
                   <plan.icon size={28} />
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">Weekly Premium</p>
-                  <p className="text-2xl font-black text-neutral-900">₹{plan.premium}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-1">Weekly Premium</p>
+                  <p className="text-4xl font-display tracking-tighter text-neutral-900">₹{plan.premium}</p>
                 </div>
               </div>
               
               <div className="flex-1">
-                <h4 className="text-xl font-black text-neutral-900 mb-2">{plan.name}</h4>
+                <h4 className="text-2xl font-black uppercase tracking-tighter text-neutral-900 mb-2">{plan.name}</h4>
                 <p className="text-neutral-500 text-sm font-medium leading-relaxed">{plan.tagline}</p>
               </div>
 
               <div className="mt-8 pt-6 border-t border-neutral-50 flex items-center justify-between text-neutral-400 group-hover:text-neutral-900 transition-colors">
-                <span className="text-[10px] font-black uppercase tracking-widest">View Full Details</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">View Full Details</span>
                 {selectedPlan === plan.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </div>
             </button>
