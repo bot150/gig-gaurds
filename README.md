@@ -382,5 +382,4 @@ Early warnings sent before severe weather events
 - Reduced government welfare burden  
 - Better urban planning insights  
 - Global model for climate-risk protection   
-### In Admin Password  Ends With
-@ergoshield
+
