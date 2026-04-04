@@ -10,7 +10,11 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, profile: null, loading: true });
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  profile: null, 
+  loading: true
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userDoc = doc(db, 'users', firebaseUser.uid);
         unsubProfile = onSnapshot(userDoc, (docSnap) => {
           if (docSnap.exists()) {
-            setProfile(docSnap.data() as UserProfile);
+            const data = docSnap.data() as UserProfile;
+            setProfile(data);
           }
           setLoading(false);
         }, (error) => {

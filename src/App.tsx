@@ -19,7 +19,7 @@ import { Admin } from './pages/Admin';
 import { Sidebar } from './components/Sidebar';
 import Layout from './components/Layout';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean }> = ({ children, adminOnly }) => {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
 
@@ -36,9 +36,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   // If user is logged in but has no profile, redirect to onboarding
-  // EXCEPT if they are already on the onboarding page
   if (!profile && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
+  }
+
+  // Role-based access control
+  if (adminOnly && profile?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -93,8 +97,39 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      <Route path="/admin" element={
-        <ProtectedRoute>
+      {/* Admin Routes */}
+      <Route path="/admin/analytics" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/claims" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/workers" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/risk-map" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/reports" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/triggers" element={
+        <ProtectedRoute adminOnly>
+          <Admin />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/settings" element={
+        <ProtectedRoute adminOnly>
           <Admin />
         </ProtectedRoute>
       } />

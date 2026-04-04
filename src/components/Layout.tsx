@@ -21,7 +21,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <div className="min-h-screen bg-neutral-50">
       <header className="h-16 bg-white border-b border-neutral-200 px-8 flex items-center justify-between sticky top-0 z-10">
         <h1 className="text-lg font-black text-neutral-900 tracking-tight">
-          {navLabels[location.pathname] || 'GigShield'}
+          {navLabels[location.pathname] || 'ErgoShield'}
         </h1>
         <div className="flex items-center gap-4">
           <button className="p-2 text-neutral-500 hover:bg-neutral-50 rounded-full relative">

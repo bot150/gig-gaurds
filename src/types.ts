@@ -46,6 +46,26 @@ export interface UserProfile {
   location?: string;
   photoURL?: string;
   createdAt: string;
+  isVerified?: boolean; // For Admin OTP verification
+  otp?: string; // Temporary OTP storage
+  otpExpiry?: string; // OTP expiry timestamp
+}
+
+export interface Complaint {
+  id?: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  subject: string;
+  description: string;
+  paymentId?: string;
+  proofUrl?: string;
+  screenshotUrl?: string;
+  status: 'pending' | 'solved';
+  adminResponse?: string;
+  respondedBy?: string;
+  respondedAt?: string;
+  createdAt: string;
 }
 
 export interface InsurancePolicy {

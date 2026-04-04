@@ -35,6 +35,8 @@ import { doc, updateDoc, collection, addDoc, serverTimestamp, onSnapshot, query,
 import { toast } from 'sonner';
 import { PolicyTemplate, CoveredEvent, WeatherData } from '../types';
 import { calculateRiskScore, calculateDynamicPremium } from '../services/riskService';
+import { predictRiskScore, calculateMLPremium, MLRiskInput, MLRiskOutput } from '../services/mlRiskService';
+import { DynamicPremiumCard } from '../components/DynamicPremiumCard';
 
 const EVENT_DISPLAY_NAMES: Record<CoveredEvent, string> = {
   rains_floods_cyclones: 'Rains, Floods, Cyclones',
@@ -135,6 +137,34 @@ export const Insurance: React.FC = () => {
   const [isClaiming, setIsClaiming] = useState<string | null>(null);
   const [aiAssessment, setAiAssessment] = useState<RiskAssessment | null>(null);
   const [isAssessing, setIsAssessing] = useState(false);
+  const [mlRiskData, setMlRiskData] = useState<Record<string, MLRiskOutput>>({});
+
+  useEffect(() => {
+    if (!weather) return;
+
+    const standardInput: MLRiskInput = {
+      rainProbability: weather.condition === 'Rain' ? 0.8 : weather.condition === 'Clouds' ? 0.3 : 0.1,
+      floodCycloneRisk: ['Mumbai', 'Chennai', 'Visakhapatnam', 'Vizag'].includes(weather.city) ? 0.6 : 0.2,
+      aqiValue: (weather.aqi || 50) / 500,
+      disruptionProbability: activeDisruptions.length > 0 ? 0.7 : 0.1,
+      extremeTempRisk: (weather.temp > 40 || weather.temp < 5) ? 0.8 : 0.2,
+      previousClaimsCount: userClaims.length
+    };
+
+    const proInput: MLRiskInput = {
+      ...standardInput,
+      pandemicRisk: 0.05, // Mock value
+      lockdownProbability: 0.02, // Mock value
+    };
+
+    const standardScore = predictRiskScore(standardInput, 'Standard');
+    const proScore = predictRiskScore(proInput, 'Pro');
+
+    setMlRiskData({
+      'Standard Plan': calculateMLPremium(standardScore, 'Standard'),
+      'Pro Plan': calculateMLPremium(proScore, 'Pro')
+    });
+  }, [weather, activeDisruptions, userClaims]);
 
   useEffect(() => {
     if (!user) return;
@@ -191,8 +221,8 @@ export const Insurance: React.FC = () => {
     // Fetch Policy Templates
     const unsubPolicies = onSnapshot(collection(db, 'policy_templates'), (snap) => {
       const allPolicies = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as PolicyTemplate));
-      // STRICT FILTER: Only show the two target GigShield plans and ensure uniqueness by name
-      const targetNames = ['GigShield Standard', 'GigShield Pro'];
+      // STRICT FILTER: Only show the three target ErgoShield plans and ensure uniqueness by name
+      const targetNames = ['Basic Plan', 'Standard Plan', 'Pro Plan'];
       
       const uniquePoliciesMap = new Map<string, PolicyTemplate>();
       allPolicies.forEach(p => {
@@ -243,9 +273,9 @@ export const Insurance: React.FC = () => {
       const snap = await getDocs(collection(db, 'policy_templates'));
       const existingDocs = snap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
       
-      const targetPolicyNames = ['GigShield Standard', 'GigShield Pro'];
+      const targetPolicyNames = ['Basic Plan', 'Standard Plan', 'Pro Plan'];
       
-      // 1. Aggressively cleanup any policy that isn't one of the two target plans
+      // 1. Aggressively cleanup any policy that isn't one of the three target plans
       // OR any duplicate of the target plans
       const seenNames = new Set<string>();
       for (const docInfo of existingDocs) {
@@ -263,28 +293,41 @@ export const Insurance: React.FC = () => {
       // 2. Add missing target plans
       const initialPolicies: Partial<PolicyTemplate>[] = [
         {
-          name: 'GigShield Standard',
+          name: 'Basic Plan',
           coverageType: 'Parametric',
-          coveredEvents: ['rains_floods_cyclones', 'extreme_temperature', 'aqi', 'strikes', 'lockdown'],
-          coverageLimit: 10000,
-          basePremium: 70,
+          coveredEvents: ['rains_floods_cyclones', 'aqi'],
+          coverageLimit: 5000,
+          basePremium: 30,
+          durationDays: 7,
+          riskCategory: 'low',
+          description: 'Fixed premium protection for essential weather and environmental risks.',
+          termsAndConditions: ['Payout = Lost Hours × ₹60 × Coverage %', 'Max weekly payout = 4x Premium'],
+          verificationRules: ['Hyper-local weather data verification'],
+          createdAt: new Date().toISOString()
+        },
+        {
+          name: 'Standard Plan',
+          coverageType: 'Parametric',
+          coveredEvents: ['rains_floods_cyclones', 'extreme_temperature', 'aqi', 'strikes'],
+          coverageLimit: 15000,
+          basePremium: 50,
           durationDays: 7,
           riskCategory: 'medium',
-          description: 'Balanced protection with automatic payouts based on income loss formula.',
+          description: 'Balanced protection with ML-powered dynamic premium adjustments.',
           termsAndConditions: ['Payout = Lost Hours × ₹90 × Coverage %', 'Max weekly payout = 4x Premium'],
           verificationRules: ['Hyper-local weather data verification', 'Platform disruption validation'],
           createdAt: new Date().toISOString()
         },
         {
-          name: 'GigShield Pro',
+          name: 'Pro Plan',
           coverageType: 'Comprehensive',
           coveredEvents: ['rains_floods_cyclones', 'wars', 'pandemic', 'strikes', 'lockdown', 'aqi', 'refuge_migration', 'global_recession', 'extreme_temperature', 'curfews_transport_bans'],
           coverageLimit: 50000,
-          basePremium: 50,
+          basePremium: 70,
           durationDays: 7,
           riskCategory: 'high',
-          description: 'Full-spectrum protection including civil unrest and economic recession.',
-          termsAndConditions: ['Payout = Lost Hours × ₹90 × Coverage %', 'Max weekly payout = 4x Premium'],
+          description: 'Full-spectrum protection with advanced ML-powered dynamic premium adjustments.',
+          termsAndConditions: ['Payout = Lost Hours × ₹120 × Coverage %', 'Max weekly payout = 4x Premium'],
           verificationRules: ['Multi-source AI verification'],
           createdAt: new Date().toISOString()
         }
@@ -571,7 +614,7 @@ export const Insurance: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Insurance & Protection</h2>
+          <h2 className="text-3xl font-black text-neutral-900 tracking-tight">ErgoShield Protection</h2>
           <p className="text-neutral-500 font-medium">AI-powered coverage for real-world gig work risks.</p>
         </div>
 
@@ -667,7 +710,8 @@ export const Insurance: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {policies.map((policy) => {
-          const dynamicPremium = calculateDynamicPremium(policy.basePremium, riskScore, policy.riskCategory);
+          const mlData = mlRiskData[policy.name];
+          const dynamicPremium = mlData ? mlData.finalPremium : policy.basePremium;
           const colors = colorMap[policy.riskCategory];
           
           return (
@@ -692,8 +736,39 @@ export const Insurance: React.FC = () => {
                 
                 <div className="flex-1">
                   <h4 className="text-xl font-black text-neutral-900 mb-2">{policy.name}</h4>
-                  <p className="text-neutral-500 text-sm font-medium leading-relaxed">{policy.description}</p>
-                  <div className="flex flex-wrap gap-2 mt-4">
+                  <p className="text-neutral-500 text-sm font-medium leading-relaxed mb-4">{policy.description}</p>
+                  
+                  {mlData && (
+                    <div className="mb-4 p-3 bg-neutral-50 rounded-2xl border border-neutral-100 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">Risk Score</span>
+                        <span className="text-[10px] font-black text-neutral-900">{mlData.riskScore.toFixed(2)}</span>
+                      </div>
+                      {mlData.adjustment !== 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">
+                            {mlData.adjustment < 0 ? 'Discount' : 'Adjustment'}
+                          </span>
+                          <span className={`text-[10px] font-black ${mlData.adjustment < 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {mlData.adjustment > 0 ? `+₹${mlData.adjustment}` : `-₹${Math.abs(mlData.adjustment)}`}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center pt-2 border-t border-neutral-200">
+                        <span className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">Final Premium</span>
+                        <span className="text-[10px] font-black text-neutral-900">₹{mlData.finalPremium}/week</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {!mlData && policy.name === 'Basic Plan' && (
+                    <div className="mb-4 p-3 bg-neutral-50 rounded-2xl border border-neutral-100 flex justify-between items-center">
+                      <span className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">Fixed Premium</span>
+                      <span className="text-[10px] font-black text-neutral-900">₹{policy.basePremium}/week</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
                     {policy.coveredEvents.slice(0, 3).map((event) => (
                       <span key={event} className="px-2 py-1 bg-neutral-50 text-neutral-400 rounded-lg text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
                         {React.createElement(EVENT_ICONS[event], { size: 10 })}
@@ -735,8 +810,9 @@ export const Insurance: React.FC = () => {
           >
             {(() => {
               const policy = policies.find(p => p.id === selectedPlan)!;
+              const mlData = mlRiskData[policy.name];
+              const dynamicPremium = mlData ? mlData.finalPremium : policy.basePremium;
               const colors = colorMap[policy.riskCategory];
-              const dynamicPremium = calculateDynamicPremium(policy.basePremium, riskScore, policy.riskCategory);
               
               return (
                 <div className={`relative bg-gradient-to-br from-white ${colors.from} rounded-[40px] border-2 ${colors.borderLight} shadow-2xl overflow-hidden`}>
@@ -873,6 +949,22 @@ export const Insurance: React.FC = () => {
                             <span className="text-3xl font-black text-neutral-900">₹{dynamicPremium}</span>
                             <span className="text-neutral-400 text-xs font-bold">/week</span>
                           </div>
+                          
+                          {mlData && (
+                            <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest">Risk Score</span>
+                                <span className="text-[10px] font-bold text-neutral-900">{mlData.riskScore.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest">Adjustment</span>
+                                <span className={`text-[10px] font-bold ${mlData.adjustment < 0 ? 'text-emerald-600' : mlData.adjustment > 0 ? 'text-rose-600' : 'text-neutral-900'}`}>
+                                  {mlData.adjustment > 0 ? `+₹${mlData.adjustment}` : mlData.adjustment < 0 ? `-₹${Math.abs(mlData.adjustment)}` : '₹0'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           <div className="mt-4 pt-4 border-t border-neutral-100 space-y-2">
                             <div className="flex justify-between items-center">
                               <span className="text-[8px] font-black uppercase text-neutral-400 tracking-widest">Profit Protection</span>
@@ -941,6 +1033,13 @@ export const Insurance: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Dynamic Premium Calculation (ML Module) */}
+      {mlRiskData['Standard Plan'] && mlRiskData['Pro Plan'] && (
+        <div className="mb-12">
+          <DynamicPremiumCard data={mlRiskData['Pro Plan']} />
+        </div>
+      )}
 
       {/* Insurance Domain Knowledge */}
       <div className="bg-white p-10 rounded-[40px] border border-neutral-100 shadow-sm space-y-8">

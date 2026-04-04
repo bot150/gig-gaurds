@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Claim } from '../types';
 import { 
   Search, 
@@ -19,118 +20,474 @@ import {
   BarChart3,
   ClipboardCheck,
   Zap,
-  MessageSquare
+  MessageSquare,
+  Users,
+  Map as MapIcon,
+  FileText,
+  Mail,
+  Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { useClaims } from '../ClaimsContext';
 import { db, OperationType, handleFirestoreError } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, query, collection, where, onSnapshot } from 'firebase/firestore';
 
 export const Admin: React.FC = () => {
   const { claims, triggerDisruption } = useClaims();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'claims'>('analytics');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const activeTab = useMemo(() => {
+    const path = location.pathname;
+    if (path.includes('analytics')) return 'analytics';
+    if (path.includes('claims')) return 'claims';
+    if (path.includes('workers')) return 'workers';
+    if (path.includes('risk-map')) return 'map';
+    if (path.includes('reports')) return 'reports';
+    if (path.includes('triggers')) return 'controls';
+    if (path.includes('settings')) return 'settings';
+    return 'analytics';
+  }, [location.pathname]);
 
   const pendingCount = claims.filter(c => c.status === 'needs_manual_review').length;
 
+  const tabs = [
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/admin/analytics' },
+    { id: 'claims', label: 'Claims', icon: ClipboardCheck, count: pendingCount, path: '/admin/claims' },
+    { id: 'workers', label: 'Workers', icon: Users, path: '/admin/workers' },
+    { id: 'map', label: 'Risk Map', icon: MapIcon, path: '/admin/risk-map' },
+    { id: 'reports', label: 'Reports', icon: FileText, path: '/admin/reports' },
+    { id: 'controls', label: 'Controls', icon: Zap, path: '/admin/triggers' },
+    { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' },
+  ];
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="flex flex-col gap-2">
           <h2 className="text-3xl font-black text-neutral-900 tracking-tight">Admin Control Center</h2>
-          <p className="text-neutral-500 font-medium">Manage claims, monitor risks, and trigger simulations.</p>
+          <p className="text-neutral-500 font-medium">Manage the ErgoShield ecosystem and monitor real-time risks.</p>
         </div>
 
-        <div className="flex bg-neutral-100 p-1 rounded-2xl">
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest transition-all relative ${
-              activeTab === 'analytics' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
-            }`}
-          >
-            Analytics
-          </button>
-          <button
-            onClick={() => setActiveTab('claims')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest transition-all relative flex items-center gap-2 ${
-              activeTab === 'claims' ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
-            }`}
-          >
-            Claims Management
-            {pendingCount > 0 && (
-              <span className="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
-                {pendingCount}
-              </span>
-            )}
-          </button>
+        <div className="flex flex-wrap bg-neutral-100 p-1 rounded-2xl overflow-x-auto no-scrollbar">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => navigate(tab.path)}
+              className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all relative flex items-center gap-2 whitespace-nowrap ${
+                activeTab === tab.id ? 'bg-white text-neutral-900 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'
+              }`}
+            >
+              <tab.icon size={14} />
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="bg-amber-500 text-white text-[8px] px-1.5 py-0.5 rounded-full">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
       <AnimatePresence mode="wait">
-        {activeTab === 'analytics' ? (
-          <motion.div 
-            key="analytics"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-8"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
-                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                  <BarChart3 size={28} />
-                </div>
-                <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Total Payouts</p>
-                <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">₹{claims.filter(c => c.status === 'processed' || c.status === 'approved').reduce((acc, c) => acc + c.amount, 0).toLocaleString()}</p>
-              </div>
-              <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
-                <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                  <ClipboardCheck size={28} />
-                </div>
-                <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Claims Processed</p>
-                <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">{claims.filter(c => c.status === 'processed' || c.status === 'approved').length}</p>
-              </div>
-              <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
-                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                  <AlertCircle size={28} />
-                </div>
-                <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Pending Review</p>
-                <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">{pendingCount}</p>
-              </div>
-            </div>
-
-            <div className="bg-neutral-900 p-8 rounded-[40px] text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl border border-neutral-800">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center shrink-0">
-                  <Zap size={32} />
-                </div>
-                <div>
-                  <h4 className="font-black text-xl tracking-tight">Simulation Controls</h4>
-                  <p className="text-sm text-neutral-400 font-medium">Trigger a mock calamity event to test automated STP logic and manual review flows.</p>
-                </div>
-              </div>
-              <button 
-                onClick={triggerDisruption}
-                className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all flex items-center gap-3"
-              >
-                <Zap size={20} />
-                Trigger Disruption
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="claims"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ClaimsManagement />
-          </motion.div>
-        )}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+        >
+          {activeTab === 'analytics' && <AnalyticsDashboard claims={claims} />}
+          {activeTab === 'claims' && <ClaimsManagement />}
+          {activeTab === 'workers' && <WorkerRegistry />}
+          {activeTab === 'map' && <RiskMap />}
+          {activeTab === 'reports' && <ReportsModule claims={claims} />}
+          {activeTab === 'controls' && <SystemControls triggerDisruption={triggerDisruption} />}
+          {activeTab === 'settings' && <SystemSettings />}
+        </motion.div>
       </AnimatePresence>
+    </div>
+  );
+};
+
+const SystemSettings: React.FC = () => {
+  const [settings, setSettings] = useState({
+    basePremium: 50,
+    riskThresholdHigh: 0.6,
+    riskThresholdLow: 0.3,
+    payoutMultiplier: 1.5,
+    autoApproveEnabled: true,
+  });
+
+  const handleSave = () => {
+    toast.success('System configurations updated successfully.');
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-black text-neutral-900 tracking-tight">System Configurations</h3>
+        <button 
+          onClick={handleSave}
+          className="px-8 py-3 bg-emerald-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition-all"
+        >
+          Save Changes
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm space-y-6">
+          <h4 className="font-black text-neutral-900 uppercase tracking-widest text-xs">Premium & Payouts</h4>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-2">Base Weekly Premium (₹)</label>
+              <input 
+                type="number" 
+                value={settings.basePremium}
+                onChange={e => setSettings({ ...settings, basePremium: Number(e.target.value) })}
+                className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-2">Payout Multiplier</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={settings.payoutMultiplier}
+                onChange={e => setSettings({ ...settings, payoutMultiplier: Number(e.target.value) })}
+                className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm space-y-6">
+          <h4 className="font-black text-neutral-900 uppercase tracking-widest text-xs">Risk Thresholds</h4>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-2">High Risk Score Threshold</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={settings.riskThresholdHigh}
+                onChange={e => setSettings({ ...settings, riskThresholdHigh: Number(e.target.value) })}
+                className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-2">Low Risk Score Threshold</label>
+              <input 
+                type="number" 
+                step="0.1"
+                value={settings.riskThresholdLow}
+                onChange={e => setSettings({ ...settings, riskThresholdLow: Number(e.target.value) })}
+                className="w-full px-6 py-3 bg-neutral-50 border border-neutral-100 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm flex items-center justify-between">
+          <div>
+            <h4 className="font-black text-neutral-900">Auto-Approve Claims</h4>
+            <p className="text-sm text-neutral-500">Enable automated STP for low-risk claims.</p>
+          </div>
+          <button 
+            onClick={() => setSettings({ ...settings, autoApproveEnabled: !settings.autoApproveEnabled })}
+            className={`w-14 h-8 rounded-full transition-all relative ${settings.autoApproveEnabled ? 'bg-emerald-500' : 'bg-neutral-200'}`}
+          >
+            <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${settings.autoApproveEnabled ? 'right-1' : 'left-1'}`} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AnalyticsDashboard: React.FC<{ claims: Claim[] }> = ({ claims }) => {
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
+          <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <BarChart3 size={28} />
+          </div>
+          <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Total Payouts</p>
+          <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">₹{claims.filter(c => c.status === 'processed' || c.status === 'approved').reduce((acc, c) => acc + c.amount, 0).toLocaleString()}</p>
+        </div>
+        <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
+          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <ClipboardCheck size={28} />
+          </div>
+          <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Claims Processed</p>
+          <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">{claims.filter(c => c.status === 'processed' || c.status === 'approved').length}</p>
+        </div>
+        <div className="bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm hover:shadow-md transition-all">
+          <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <AlertCircle size={28} />
+          </div>
+          <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Pending Review</p>
+          <p className="text-3xl font-black text-neutral-900 mt-1 tracking-tight">{claims.filter(c => c.status === 'needs_manual_review').length}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm h-[400px] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <BarChart3 size={48} className="mx-auto text-neutral-200" />
+            <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs">Payout Trends (D3 Chart Placeholder)</p>
+          </div>
+        </div>
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm h-[400px] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Zap size={48} className="mx-auto text-neutral-200" />
+            <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs">Risk Distribution (D3 Chart Placeholder)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const WorkerRegistry: React.FC = () => {
+  const [workers, setWorkers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    const q = query(collection(db, 'users'), where('role', '==', 'worker'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setWorkers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const filteredWorkers = workers.filter(w => 
+    w.fullName?.toLowerCase().includes(search.toLowerCase()) || 
+    w.email?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleToggleStatus = async (workerId: string, currentStatus: boolean) => {
+    try {
+      await updateDoc(doc(db, 'users', workerId), {
+        isVerified: !currentStatus
+      });
+      toast.success(`Worker status updated.`);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `users/${workerId}`);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-black text-neutral-900 tracking-tight">Worker Registry</h3>
+        <div className="relative w-64">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
+          <input
+            type="text"
+            placeholder="Search workers..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-white border border-neutral-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[40px] border border-neutral-100 shadow-sm overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-neutral-50 text-[10px] font-black uppercase tracking-widest text-neutral-400 border-b border-neutral-100">
+              <th className="px-8 py-5">Worker Name</th>
+              <th className="px-6 py-5">Email</th>
+              <th className="px-6 py-5">Status</th>
+              <th className="px-6 py-5">Joined</th>
+              <th className="px-8 py-5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-neutral-50">
+            {loading ? (
+              <tr><td colSpan={5} className="p-12 text-center"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" /></td></tr>
+            ) : filteredWorkers.length === 0 ? (
+              <tr><td colSpan={5} className="p-12 text-center text-neutral-400 font-medium">No workers found.</td></tr>
+            ) : (
+              filteredWorkers.map((worker) => (
+                <tr key={worker.id} className="hover:bg-neutral-50/50 transition-colors">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center font-black text-neutral-400">
+                        {worker.fullName?.[0]}
+                      </div>
+                      <span className="font-bold text-neutral-900">{worker.fullName}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 text-sm text-neutral-500">{worker.email}</td>
+                  <td className="px-6 py-5">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${worker.isVerified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {worker.isVerified ? 'Verified' : 'Pending'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-5 text-xs text-neutral-400">{new Date(worker.createdAt).toLocaleDateString()}</td>
+                  <td className="px-8 py-5 text-right">
+                    <button 
+                      onClick={() => handleToggleStatus(worker.id, worker.isVerified)}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                        worker.isVerified ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                      }`}
+                    >
+                      {worker.isVerified ? 'Block' : 'Verify'}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const RiskMap: React.FC = () => {
+  const zones = [
+    { name: 'Vijayawada', risk: 'High', color: 'bg-red-500', count: 124 },
+    { name: 'Guntur', risk: 'Medium', color: 'bg-amber-500', count: 89 },
+    { name: 'Amaravati', risk: 'Low', color: 'bg-emerald-500', count: 45 },
+    { name: 'Krishna Dist', risk: 'High', color: 'bg-red-500', count: 210 },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-black text-neutral-900 tracking-tight">Calamity Risk Map</h3>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500" /><span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">High Risk</span></div>
+          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500" /><span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Medium Risk</span></div>
+          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500" /><span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Low Risk</span></div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-white p-4 rounded-[40px] border border-neutral-100 shadow-sm h-[500px] relative overflow-hidden">
+          <div className="absolute inset-0 bg-neutral-50 flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <MapIcon size={64} className="mx-auto text-neutral-200" />
+              <p className="text-neutral-400 font-bold uppercase tracking-widest text-xs">Interactive Map (Leaflet/D3 Placeholder)</p>
+            </div>
+          </div>
+          {/* Mock markers */}
+          <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-red-500 rounded-full animate-ping opacity-75" />
+          <div className="absolute top-1/4 left-1/3 w-6 h-6 bg-red-500 rounded-full shadow-lg border-2 border-white" />
+          <div className="absolute bottom-1/3 right-1/4 w-6 h-6 bg-amber-500 rounded-full animate-ping opacity-75" />
+          <div className="absolute bottom-1/3 right-1/4 w-6 h-6 bg-amber-500 rounded-full shadow-lg border-2 border-white" />
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-sm font-black text-neutral-900 uppercase tracking-widest mb-4">Zone Breakdown</h4>
+          {zones.map((zone) => (
+            <div key={zone.name} className="bg-white p-6 rounded-3xl border border-neutral-100 shadow-sm flex items-center justify-between">
+              <div>
+                <p className="font-black text-neutral-900">{zone.name}</p>
+                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">{zone.count} Workers Active</p>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-black text-white uppercase tracking-widest ${zone.color}`}>
+                {zone.risk}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ReportsModule: React.FC<{ claims: Claim[] }> = ({ claims }) => {
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-black text-neutral-900 tracking-tight">System Reports</h3>
+        <button className="flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-neutral-800 transition-all shadow-lg">
+          <Download size={18} />
+          Generate Full Audit
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+              <FileText size={24} />
+            </div>
+            <h4 className="font-black text-neutral-900">Financial Summary</h4>
+          </div>
+          <p className="text-sm text-neutral-500 leading-relaxed">Detailed breakdown of premiums collected vs. claims paid out across all plans.</p>
+          <button className="w-full py-3 bg-neutral-50 text-neutral-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">Download PDF</button>
+        </div>
+        <div className="bg-white p-8 rounded-[40px] border border-neutral-100 shadow-sm space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
+              <Users size={24} />
+            </div>
+            <h4 className="font-black text-neutral-900">Worker Demographics</h4>
+          </div>
+          <p className="text-sm text-neutral-500 leading-relaxed">Analysis of worker distribution, plan popularity, and verification status.</p>
+          <button className="w-full py-3 bg-neutral-50 text-neutral-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">Download PDF</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SystemControls: React.FC<{ triggerDisruption: () => void }> = ({ triggerDisruption }) => {
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-xl font-black text-neutral-900 tracking-tight">System Controls</h3>
+        <p className="text-neutral-500 font-medium">Manual overrides and emergency protocols for the ErgoShield platform.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-neutral-900 p-10 rounded-[48px] text-white space-y-8 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform">
+            <Zap size={120} />
+          </div>
+          <div className="space-y-4 relative">
+            <div className="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-3xl flex items-center justify-center">
+              <Zap size={32} />
+            </div>
+            <h4 className="text-2xl font-black tracking-tight">Calamity Simulation</h4>
+            <p className="text-neutral-400 text-sm leading-relaxed">
+              Trigger a mock calamity event to test automated STP logic, fraud detection, and manual review flows. This will generate test claims across active zones.
+            </p>
+          </div>
+          <button 
+            onClick={triggerDisruption}
+            className="w-full py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-3 relative"
+          >
+            <Zap size={20} />
+            Trigger Disruption
+          </button>
+        </div>
+
+        <div className="bg-white p-10 rounded-[48px] border border-neutral-100 shadow-sm space-y-8">
+          <div className="space-y-4">
+            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center">
+              <AlertTriangle size={32} />
+            </div>
+            <h4 className="text-2xl font-black text-neutral-900 tracking-tight">Emergency Freeze</h4>
+            <p className="text-neutral-500 text-sm leading-relaxed">
+              Instantly pause all claim processing and payouts. Use this in case of suspected system-wide fraud or technical failure.
+            </p>
+          </div>
+          <button className="w-full py-5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-red-100 transition-all flex items-center justify-center gap-3">
+            <XCircle size={20} />
+            Freeze All Payouts
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

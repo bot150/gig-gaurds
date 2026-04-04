@@ -295,7 +295,7 @@ export const Claims: React.FC = () => {
         <div>
           <h4 className="font-black text-lg text-blue-900 tracking-tight">How payouts work?</h4>
           <p className="text-sm text-blue-700 mt-2 font-medium leading-relaxed">
-            GigShield uses parametric triggers. When weather or platform data confirms a disruption in your area, 
+            ErgoShield uses parametric triggers. When weather or platform data confirms a disruption in your area, 
             we automatically process your claim. No manual filing required! Payouts are sent directly to your linked bank account within 24 hours of approval.
           </p>
         </div>

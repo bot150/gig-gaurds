@@ -20,7 +20,8 @@ import {
   Shield,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { auth } from '../firebase';
@@ -51,13 +52,22 @@ export const Sidebar: React.FC = () => {
     await auth.signOut();
     navigate('/login');
   };
-  const navItems = [
+  const navItems = isAdmin ? [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', show: true },
+    { icon: BarChart2, label: 'Admin Dashboard', path: '/admin/analytics', show: true },
+    { icon: ClipboardCheck, label: 'Claims Management', path: '/admin/claims', show: true },
+    { icon: Users, label: 'Worker Registry', path: '/admin/workers', show: true },
+    { icon: Map, label: 'Calamity Risk Map', path: '/admin/risk-map', show: true },
+    { icon: FileText, label: 'Reports', path: '/admin/reports', show: true },
+    { icon: Zap, label: 'Trigger Controls', path: '/admin/triggers', show: true },
+    { icon: Settings, label: 'System Settings', path: '/admin/settings', show: true },
+    { icon: HelpCircle, label: 'Help & Support', path: '/support', show: true },
+  ] : [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', show: true },
+    { icon: Shield, label: 'Insurance', path: '/insurance', show: true },
     { icon: FileText, label: 'Claims', path: '/claims', show: true },
     { icon: UserCircle, label: 'Profile', path: '/profile', show: true },
-    { icon: Shield, label: 'Insurance', path: '/insurance', show: true },
-    { icon: FileText, label: 'Conditions', path: '/terms', show: true },
-    { icon: HelpCircle, label: 'Support', path: '/support', show: true },
+    { icon: HelpCircle, label: 'Help & Support', path: '/support', show: true },
   ];
 
   const activeAlert = claims?.find(c => c.status === 'pending_auto') || null;
