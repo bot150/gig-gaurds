@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Fields: uid, fullName, email, role, location, riskZone, cityTier, category, subCategory, aadharNumber, bankAccountNumber, ifscCode, age, address, riskScore, weeklyPremium, trustScore, emailVerified, otpCode, otpExpiry, otpAttempts, resetOtp, resetOtpExpiry, resetOtpAttempts, createdAt
+    //
+    // Collection: policies
+    // Fields: userId, status, startDate, endDate, premiumAmount, coverageAmount
+    //
+    // Collection: claims
+    // Fields: userId, policyId, triggerEvent, amount, status, timestamp, location, eventLocation, fraudScore, suspiciousFlags, fraudCheckStatus, eligibilityStatus, incomeLossVerified, zone, calamityType, daysLost, dailyWage, payoutStatus, aiExplanation, compensationCalculation
+    //
+    // Collection: premium_payments
+    // Fields: policyId, userId, weekNumber, amount, status, dueDate, paidAt
+    //
+    // Collection: risk_factors
+    // Fields: type, value, threshold, isTriggered, timestamp, source
+    //
+    // Collection: disruptions
+    // Fields: type, severity, location, timestamp, affectedCount
+    //
+    // Collection: support_messages
+    // Fields: uid, email, subject, message, status, createdAt, response, respondedAt
+    //
+    // Collection: policy_templates
+    // Fields: name, premium, coverage, description, category
+    //
+    // Collection: transactions
+    // Fields: userId, amount, type, status, timestamp
+    //
+    // Collection: complaints
+    // Fields: userId, subject, message, status, createdAt
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          request.auth.token.email.lower() in [
+            "sreenandasai24@gmail.com",
+            "manivardhan476@gmail.com",
+            "vannurappa0@gmail.com",
+            "saisriramnaiducheepuru@gmail.com",
+            "hydra@gmail.com",
+            "sreenanda_manda@srmap.edu.in"
+          ] ||
+          request.auth.uid in [
+            "87JMZ3U1fxShDvR4WttweHoSTUs2", // hydra@gmail.com UID
+            "z7S4n7UkPqTzFG765JMnBVkcls92"  // sreenanda_manda@srmap.edu.in UID
+          ]
+        );
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'fullName', 'email', 'role']) &&
+             data.uid is string && data.fullName is string && data.email is string &&
+             data.role in ['worker', 'admin'];
+    }
+
+    function isValidClaim(data) {
+      return data.keys().hasAll(['userId', 'policyId', 'amount', 'status', 'timestamp']) &&
+             data.userId is string && data.policyId is string && data.amount is number &&
+             data.status is string && data.timestamp is string;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(userId) && isValidUser(request.resource.data) && 
+                    (request.resource.data.role == 'worker' || isAdmin());
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin() || 
+                    (!isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resetOtp', 'resetOtpExpiry', 'resetOtpAttempts']));
+      // Allow searching by email for legacy password reset support
+      allow list: if isAdmin() || (request.query.limit <= 1);
+    }
+
+    match /policies/{policyId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+    }
+
+    match /claims/{claimId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if (isAuthenticated() && resource.data.userId == request.auth.uid && request.resource.data.status == 'appealed') || isAdmin();
+    }
+
+    match /premium_payments/{paymentId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+    }
+
+    match /risk_factors/{riskId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /disruptions/{disruptionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /support_messages/{messageId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+    }
+
+    match /policy_templates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /complaints/{complaintId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+    }
+
+    match /indices/{indexId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
