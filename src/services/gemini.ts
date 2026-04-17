@@ -1,8 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+const apiKey = process.env.GEMINI_API_KEY;
+const ai = apiKey && apiKey !== 'undefined' && apiKey !== '' ? new GoogleGenAI({ apiKey }) : null;
 
 export async function calculateRiskScore(location: string, weatherData: any) {
+  if (!ai) {
+    return { score: 50, premium: 50, reasoning: "AI service unavailable. Using default values." };
+  }
   const model = ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `
@@ -27,6 +31,12 @@ export async function calculateRiskScore(location: string, weatherData: any) {
 }
 
 export async function getRiskInsights(riskScore: number, category: string) {
+  if (!ai) {
+    return { 
+      explanation: "AI service unavailable. Using default insights.",
+      tips: ["Wear protective gear", "Stay hydrated", "Follow traffic rules"]
+    };
+  }
   const model = ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: `

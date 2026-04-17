@@ -1,7 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { UserProfile, WeatherData } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey || apiKey === 'undefined') {
+  console.warn('GEMINI_API_KEY is not set. AI features will not work.');
+}
+
+const ai = apiKey && apiKey !== 'undefined' ? new GoogleGenAI({ apiKey }) : null;
 
 export interface RiskAssessment {
   riskScore: number;
@@ -11,6 +16,9 @@ export interface RiskAssessment {
 }
 
 export const getSupportChatResponse = async (message: string, history: any[], imageData?: { data: string, mimeType: string }) => {
+  if (!ai) {
+    return "AI assistant is not available. Please set GEMINI_API_KEY in your environment variables.";
+  }
   try {
     const contents: any[] = [];
     if (imageData) {
